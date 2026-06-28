@@ -7,14 +7,15 @@ from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, jsonify
 
 import os
+from flask import Flask, render_template, request, jsonify
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-DB_PATH = os.path.join(basedir, 'contratos.db')
-
-# Inicialização do Flask
-app = Flask(__name__,
+app = Flask(__name__, 
             template_folder=os.path.join(basedir, 'templates'),
             static_folder=os.path.join(basedir, 'static'))
+
+DB_PATH = os.path.join(basedir, 'contratos.db')
 
 app.secret_key = "chave-secreta-para-sistema-financeiro-systemflow"
 
