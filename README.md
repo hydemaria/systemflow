@@ -6,107 +6,130 @@ O SystemFlow permite cadastrar contratos, monitorar datas de cobrança e enviar 
 
 O projeto combina painel web + robô de automação em Python.
 
-## Funcionalidades
+---
+
+## 💡 Funcionalidades
 
 - Cadastro de contratos
 - Definição de datas de faturamento e alerta
 - Lista de contratos em painel web
-- Envio manual de e-mails
-- Robô automático de envio de alertas
+- Envio manual de e-mails de teste
 - Remoção de contratos
-- Banco de dados local SQLite
+- Banco de dados local (SQLite)
+- Robô automático de envio de alertas por e-mail
 
 ---
 
-## Como funciona
+## ⚙️ Como funciona
 
-O sistema tem duas partes:
+### 🌐 Painel Web (Flask)
 
-### Painel Web (Flask)
 - Interface para cadastrar e visualizar contratos
-- Permite envio manual de e-mails de teste
+- Permite envio manual de e-mails
 
-### Robô de automação
-- Verifica diariamente os contratos no banco
+### 🤖 Robô de automação
+
+- Verifica diariamente o banco de dados
 - Envia e-mails quando o dia de alerta é atingido
-- Funciona de forma automática via Python
+- Pode ser executado manualmente ou via cron no Linux
 
 ---
 
-## Tecnologias
+## 🛠️ Tecnologias
 
-Backend:
-- Python
-- Flask
-- SQLite
-- SMTP
+### Backend
 
-Frontend:
-- HTML
-- TailwindCSS
-- JavaScript
-- SweetAlert2
+- Python  
+- Flask  
+- SQLite  
+- SMTP  
+
+### Frontend
+
+- HTML  
+- TailwindCSS  
+- JavaScript  
+- SweetAlert2  
 
 ---
 
-## Estrutura do projeto
+## 📁 Estrutura do projeto
 
 systemflow/
-├── app.py
-├── bot_alertas.py
-├── contratos.db
-├── templates/
-│   └── index.html
-└── static/
+
+├── app.py  
+├── bot_alertas.py  
+├── contratos.db  
+├── templates/  
+│   └── index.html  
+└── static/  
 
 ---
 
-## Como executar
+## ⚙️ Como executar o projeto
 
-Instalar dependências:
-pip install flask
+### 1. Clonar o repositório
 
-Rodar o sistema web:
-python app.py
+git clone https://github.com/hydemaria/systemflow.git  
 
-Acessar:
-http://localhost:5000
-
-Rodar o robô:
-python bot_alertas.py
+cd systemflow  
 
 ---
 
-## Automação (Linux - cron)
+### 2. Instalar dependências
 
-0 8 * * * python3 /home/maria/Projetos/systemflow/bot_alertas.py
-
----
-
-## Configuração de e-mail
-
-No bot_alertas.py:
-
-MEU_EMAIL = "seu_email@gmail.com"
-MINHA_SENHA = "senha_de_app"
-SERVIDOR_SMTP = "smtp.gmail.com"
-PORTA_SMTP = 587
+pip install flask  
 
 ---
 
-## Objetivo
+### 3. Rodar o sistema web
 
-Projeto criado para praticar:
-
-- Backend com Flask
-- Automação com Python
-- Banco de dados SQLite
-- Integração com e-mail
-- Sistema web completo
+python app.py  
 
 ---
 
-## Desenvolvido por
+### 4. Acessar no navegador
+
+http://localhost:5000  
+
+---
+
+## 🤖 Automação (robô de alertas)
+
+Executar manualmente:
+
+python bot_alertas.py  
+
+---
+
+Agendar no Linux (cron):
+
+0 8 * * * python3 /home/maria/Projetos/systemflow/bot_alertas.py  
+
+---
+
+## 🔐 Configuração de e-mail
+
+No arquivo bot_alertas.py:
+
+MEU_EMAIL = "seu_email@gmail.com"  
+MINHA_SENHA = "senha_de_app"  
+SERVIDOR_SMTP = "smtp.gmail.com"  
+PORTA_SMTP = 587  
+
+---
+
+## 🎯 Objetivo do projeto
+
+- Backend com Flask  
+- Automação com Python  
+- Banco de dados SQLite  
+- Integração com e-mail  
+- Sistema web completo  
+
+---
+
+## 👩‍💻 Desenvolvido por
 
 Maria Luiza  
 GitHub: https://github.com/hydemaria
