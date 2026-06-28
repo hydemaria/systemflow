@@ -6,14 +6,15 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, jsonify
 
-# Definição dos caminhos para a pasta do projeto SystemFlow
-base_dir = "/home/maria/Projetos/systemflow"
-DB_PATH = os.path.join(base_dir, 'contratos.db')
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+DB_PATH = os.path.join(basedir, 'contratos.db')
 
 # Inicialização do Flask
 app = Flask(__name__,
-            template_folder=os.path.join(base_dir, 'templates'),
-            static_folder=os.path.join(base_dir, 'static'))
+            template_folder=os.path.join(basedir, 'templates'),
+            static_folder=os.path.join(basedir, 'static'))
 
 app.secret_key = "chave-secreta-para-sistema-financeiro-systemflow"
 
