@@ -129,20 +129,16 @@ def enviar_alerta(id):
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
+# O try deve estar alinhado com o restante do seu código anterior
    try:
-        print("Tentando conectar ao servidor SMTP...")
-        servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
-        servidor.set_debuglevel(1)  # Isso vai imprimir MUITA informação nos logs
-        servidor.starttls()
-        print("Conexão e STARTTLS funcionaram!")
-        # Não vamos tentar o login ainda, só a conexão
-        servidor.quit()
-        return jsonify({'status': 'sucesso', 'mensagem': 'Conexão com Gmail OK!'})
+    print("Tentando conectar ao servidor SMTP...")
+    servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
+    servidor.quit()
+    return jsonify({'status': 'sucesso', 'mensagem': 'Conexão com Gmail OK!'})
 
-    except Exception as erro:
-        print(f"❌ Erro na conexão: {erro}")
-        return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500
-
+   except Exception as erro:
+    print(f"❌ Erro na conexão: {erro}")
+    return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500
 
 if __name__ == '__main__':
     init_db()
