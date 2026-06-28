@@ -27,7 +27,7 @@ def verificar_e_enviar_alertas():
 
     # CONFIGURAÇÕES DE E-MAIL (Agora fora do if!)
     MEU_EMAIL = "systemflow.automacao@gmail.com"  
-    MINHA_SENHA = "ycjt vkac wexk zyrn " 
+    MINHA_SENHA = "ycjtvkacwexkzyrn " 
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
