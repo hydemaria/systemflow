@@ -36,7 +36,6 @@ def verificar_e_enviar_alertas():
         servidor.starttls()
         servidor.login(MEU_EMAIL, MINHA_SENHA)
 
-        # Percorre a lista de contratos
         for contrato in contratos_de_hoje:
             numero_contrato, nome_cliente, email_notificacao, dia_faturamento = contrato
 
