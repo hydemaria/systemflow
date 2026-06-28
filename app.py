@@ -123,7 +123,7 @@ def enviar_alerta(id):
 
     # Configurações do servidor de e-mail (SMTP)
     MEU_EMAIL = "systemflow.automacao@gmail.com"
-    MINHA_SENHA = "ycjt vkac wexk zyrn"
+    MINHA_SENHA = "ycjtvkacwexkzyrn"
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
