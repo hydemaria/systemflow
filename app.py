@@ -144,7 +144,10 @@ def enviar_alerta(id):
         return jsonify({'status': 'sucesso', 'mensagem': 'E-mail enviado!'})
 
     except Exception as erro:
-        print(f"❌ Ocorreu um erro: {erro}")
+        # Vamos imprimir o erro completo com o traceback
+        import traceback
+        print("❌ ERRO DETALHADO:")
+        print(traceback.format_exc())
         return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500
 
     
