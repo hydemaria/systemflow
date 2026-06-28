@@ -5,6 +5,8 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, jsonify
+from dotenv import load_dotenv
+load_dotenv()
 
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -21,7 +23,6 @@ app.secret_key = "chave-secreta-para-sistema-financeiro-systemflow"
 
 
 def init_db():
-    # Cria a tabela de contratos se ela não existir
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
@@ -43,13 +44,11 @@ def init_db():
 
 @app.route('/')
 def home():
-    # Carrega a página inicial do painel
     return render_template('index.html')
 
 
 @app.route('/api/contratos', methods=['GET'])
 def listar_contratos():
-    # Busca os contratos armazenados no banco de dados
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM contratos')
@@ -74,7 +73,6 @@ def listar_contratos():
 
 @app.route('/api/contratos', methods=['POST'])
 def adicionar_contrato():
-    # Recebe os dados do formulário e salva no banco de dados
     dados = request.json
     hoje = datetime.now().strftime('%Y-%m-%d')
 
@@ -100,7 +98,6 @@ def adicionar_contrato():
 
 @app.route('/api/contratos/<int:id>', methods=['DELETE'])
 def deletar_contrato(id):
-    # Remove um contrato específico do banco de dados
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('DELETE FROM contratos WHERE id = ?', (id,))
@@ -111,10 +108,12 @@ def deletar_contrato(id):
 
 @app.route('/api/contratos/<int:id>/enviar-alerta', methods=['POST'])
 def enviar_alerta(id):
-    # Envia um e-mail de alerta manual usando o servidor SMTP
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute('SELECT numero_contrato, nome_cliente, email_notificacao, dia_faturamento FROM contratos WHERE id = ?', (id,))
+    cursor.execute(
+        'SELECT numero_contrato, nome_cliente, email_notificacao, dia_faturamento FROM contratos WHERE id = ?',
+        (id,)
+    )
     contrato = cursor.fetchone()
     conn.close()
 
@@ -122,48 +121,53 @@ def enviar_alerta(id):
         return jsonify({'status': 'erro', 'mensagem': 'Contrato não encontrado'}), 404
 
     numero_contrato, nome_cliente, email_notificacao, dia_faturamento = contrato
+    print("EMAIL DO BANCO:", email_notificacao)
 
-    # Configurações do servidor de e-mail (SMTP)
     MEU_EMAIL = "systemflow.automacao@gmail.com"
     MINHA_SENHA = os.environ.get('EMAIL_SENHA')
     SERVIDOR_SMTP = "smtp.gmail.com"
-    PORTA_SMTP = 465
+    PORTA_SMTP = 587
+    print("ENV REAL:", os.environ.get('EMAIL_SENHA'))
+    print("VAR DIRETA:", MINHA_SENHA)
+
+
+    if not email_notificacao:
+        return jsonify({'status': 'erro', 'mensagem': 'E-mail vazio no banco'}), 400
 
     try:
+        corpo_email = f"""
+🚨 LEMBRETE DE FATURAMENTO - SYSTEMFLOW
+
+Atenção,
+
+Este é um alerta automático para o setor de faturamento.
+O contrato número {numero_contrato} (Cliente: {nome_cliente}) precisa ser faturado no dia correto.
+
+🗓️ Dia do Faturamento: {dia_faturamento}
+
+Bom trabalho,
+Sistema de Alertas SystemFlow
+"""
+
         mensagem = MIMEMultipart()
         mensagem['From'] = MEU_EMAIL
         mensagem['To'] = email_notificacao
         mensagem['Subject'] = f"🚨 TAREFA: Faturamento Contrato Nº {numero_contrato} ({nome_cliente})"
 
-        corpo_email = f"""
-        🚨 LEMBRETE DE FATURAMENTO - SYSTEMFLOW
-
-        Atenção,
-
-        Este é um alerta automático para o setor de faturamento.
-        O contrato número {numero_contrato} (Cliente: {nome_cliente}) precisa ser faturado no dia correto.
-
-        🗓️ Dia do Faturamento: {dia_faturamento}
-
-        Por favor, certifique-se de que a verificação no Data Bit e o fechamento de leituras no PrintWayy sejam realizados sem atrasos para este contrato.
-
-        Bom trabalho,
-        Sistema de Alertas SystemFlow
-        """
         mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
 
-        servidor = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) 
-        servidor.starttls()
+        servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
         servidor.starttls()
         servidor.login(MEU_EMAIL, MINHA_SENHA)
+
         servidor.sendmail(MEU_EMAIL, email_notificacao, mensagem.as_string())
         servidor.quit()
 
-        return jsonify({'status': 'sucesso', 'mensagem': f'Lembrete real enviado com sucesso para o funcionário ({email_notificacao})!'})
+        return jsonify({'status': 'sucesso', 'mensagem': 'E-mail enviado com sucesso!'})
 
     except Exception as erro:
-        print(f"❌ Ocorreu um erro ao tentar enviar o e-mail: {erro}")
-        return jsonify({'status': 'erro', 'mensagem': 'Não foi possível enviar o e-mail real. Verifique as credenciais no terminal.'}), 500
+        print(f"❌ Erro ao enviar e-mail: {erro}")
+        return jsonify({'status': 'erro', 'mensagem': 'Falha ao enviar e-mail'}), 500
 
 
 if __name__ == '__main__':
