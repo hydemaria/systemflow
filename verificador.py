@@ -30,11 +30,12 @@ def verificar_e_enviar_alertas():
     # CONFIGURAÇÕES DE E-MAIL (Agora fora do if!)
     MEU_EMAIL = "systemflow.automacao@gmail.com"  
     SERVIDOR_SMTP = "smtp.gmail.com"
-    PORTA_SMTP = 587
+    PORTA_SMTP = 465
 
     try:
         # Inicializa a conexão
-        servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
+        servidor = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) 
+        servidor.starttls()
         servidor.starttls()
         servidor.login(MEU_EMAIL, MINHA_SENHA)
 

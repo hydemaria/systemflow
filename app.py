@@ -127,7 +127,7 @@ def enviar_alerta(id):
     MEU_EMAIL = "systemflow.automacao@gmail.com"
     MINHA_SENHA = os.environ.get('EMAIL_SENHA')
     SERVIDOR_SMTP = "smtp.gmail.com"
-    PORTA_SMTP = 587
+    PORTA_SMTP = 465
 
     try:
         mensagem = MIMEMultipart()
@@ -152,7 +152,8 @@ def enviar_alerta(id):
         """
         mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
 
-        servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
+        servidor = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) 
+        servidor.starttls()
         servidor.starttls()
         servidor.login(MEU_EMAIL, MINHA_SENHA)
         servidor.sendmail(MEU_EMAIL, email_notificacao, mensagem.as_string())
