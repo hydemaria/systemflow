@@ -111,7 +111,6 @@ def deletar_contrato(id):
 
 @app.route('/api/contratos/<int:id>/enviar-alerta', methods=['POST'])
 def enviar_alerta(id):
-    # Envia um e-mail de alerta manual usando o servidor SMTP
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('SELECT numero_contrato, nome_cliente, email_notificacao, dia_faturamento FROM contratos WHERE id = ?', (id,))
@@ -123,15 +122,8 @@ def enviar_alerta(id):
 
     numero_contrato, nome_cliente, email_notificacao, dia_faturamento = contrato
 
-    # Configurações do servidor de e-mail (SMTP)
     MEU_EMAIL = "systemflow.automacao@gmail.com"
-    MINHA_SENHA = "klaa irop dzlu xlhb "
-    SERVIDOR_SMTP = "smtp.gmail.com"
-    PORTA_SMTP = 587
-
-# Configurações do servidor de e-mail (SMTP)
-    MEU_EMAIL = "systemflow.automacao@gmail.com"
-    MINHA_SENHA = "klaairopdzluxlhb"  # Removi os espaços extras que estavam aqui
+    MINHA_SENHA = "klaairopdzluxlhb"
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
@@ -140,7 +132,6 @@ def enviar_alerta(id):
         mensagem['From'] = MEU_EMAIL
         mensagem['To'] = email_notificacao
         mensagem['Subject'] = f"🚨 TAREFA: Faturamento Contrato Nº {numero_contrato} ({nome_cliente})"
-
         corpo_email = f"Este é um alerta automático para o contrato {numero_contrato}."
         mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
 
@@ -152,9 +143,9 @@ def enviar_alerta(id):
 
         return jsonify({'status': 'sucesso', 'mensagem': 'E-mail enviado!'})
 
-except Exception as erro:
-    print(f"❌ Ocorreu um erro: {erro}") 
-    return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500 
+    except Exception as erro:
+        print(f"❌ Ocorreu um erro: {erro}")
+        return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500
 
     
 if __name__ == '__main__':
