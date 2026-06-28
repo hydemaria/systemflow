@@ -124,9 +124,9 @@ def enviar_alerta(id):
     numero_contrato, nome_cliente, email_notificacao, dia_faturamento = contrato
 
     # Configurações do servidor de e-mail (SMTP)
-    MEU_EMAIL = "seu_email_de_teste@outlook.com"
-    MINHA_SENHA = "sua_senha_aqui"
-    SERVIDOR_SMTP = "smtp.office365.com"
+    MEU_EMAIL = "systemflow.automacao@gmail.com"
+    MINHA_SENHA = "klaairopdzluxlhb"
+    SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
     try:
