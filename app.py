@@ -125,21 +125,38 @@ def enviar_alerta(id):
 
     # Configurações do servidor de e-mail (SMTP)
     MEU_EMAIL = "systemflow.automacao@gmail.com"
-    MINHA_SENHA = "klaairopdzluxlhb"
+    MINHA_SENHA = "klaa irop dzlu xlhb "
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
-# O try deve estar alinhado com o restante do seu código anterior
-   try:
-    print("Tentando conectar ao servidor SMTP...")
-    servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
-    servidor.quit()
-    return jsonify({'status': 'sucesso', 'mensagem': 'Conexão com Gmail OK!'})
+# Configurações do servidor de e-mail (SMTP)
+    MEU_EMAIL = "systemflow.automacao@gmail.com"
+    MINHA_SENHA = "klaairopdzluxlhb"  # Removi os espaços extras que estavam aqui
+    SERVIDOR_SMTP = "smtp.gmail.com"
+    PORTA_SMTP = 587
 
-   except Exception as erro:
-    print(f"❌ Erro na conexão: {erro}")
-    return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500
+    try:
+        mensagem = MIMEMultipart()
+        mensagem['From'] = MEU_EMAIL
+        mensagem['To'] = email_notificacao
+        mensagem['Subject'] = f"🚨 TAREFA: Faturamento Contrato Nº {numero_contrato} ({nome_cliente})"
 
+        corpo_email = f"Este é um alerta automático para o contrato {numero_contrato}."
+        mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
+
+        servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
+        servidor.starttls()
+        servidor.login(MEU_EMAIL, MINHA_SENHA)
+        servidor.sendmail(MEU_EMAIL, email_notificacao, mensagem.as_string())
+        servidor.quit()
+
+        return jsonify({'status': 'sucesso', 'mensagem': 'E-mail enviado!'})
+
+except Exception as erro:
+    print(f"❌ Ocorreu um erro: {erro}") 
+    return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500 
+
+    
 if __name__ == '__main__':
     init_db()
     print("Banco de dados local contratos.db pronto!")
