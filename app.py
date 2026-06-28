@@ -6,16 +6,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, jsonify
 
-import os
-from flask import Flask, render_template, request, jsonify
+# Definição dos caminhos para a pasta do projeto SystemFlow
+base_dir = "/home/maria/Projetos/systemflow"
+DB_PATH = os.path.join(base_dir, 'contratos.db')
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-app = Flask(__name__, 
-            template_folder=os.path.join(basedir, 'templates'),
-            static_folder=os.path.join(basedir, 'static'))
-
-DB_PATH = os.path.join(basedir, 'contratos.db')
+# Inicialização do Flask
+app = Flask(__name__,
+            template_folder=os.path.join(base_dir, 'templates'),
+            static_folder=os.path.join(base_dir, 'static'))
 
 app.secret_key = "chave-secreta-para-sistema-financeiro-systemflow"
 
@@ -111,6 +109,7 @@ def deletar_contrato(id):
 
 @app.route('/api/contratos/<int:id>/enviar-alerta', methods=['POST'])
 def enviar_alerta(id):
+    # Envia um e-mail de alerta manual usando o servidor SMTP
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('SELECT numero_contrato, nome_cliente, email_notificacao, dia_faturamento FROM contratos WHERE id = ?', (id,))
@@ -122,8 +121,9 @@ def enviar_alerta(id):
 
     numero_contrato, nome_cliente, email_notificacao, dia_faturamento = contrato
 
+    # Configurações do servidor de e-mail (SMTP)
     MEU_EMAIL = "systemflow.automacao@gmail.com"
-    MINHA_SENHA = "klaairopdzluxlhb"
+    MINHA_SENHA = "ycjt vkac wexk zyrn"
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
@@ -132,7 +132,22 @@ def enviar_alerta(id):
         mensagem['From'] = MEU_EMAIL
         mensagem['To'] = email_notificacao
         mensagem['Subject'] = f"🚨 TAREFA: Faturamento Contrato Nº {numero_contrato} ({nome_cliente})"
-        corpo_email = f"Este é um alerta automático para o contrato {numero_contrato}."
+
+        corpo_email = f"""
+        🚨 LEMBRETE DE FATURAMENTO - SYSTEMFLOW
+
+        Atenção,
+
+        Este é um alerta automático para o setor de faturamento.
+        O contrato número {numero_contrato} (Cliente: {nome_cliente}) precisa ser faturado no dia correto.
+
+        🗓️ Dia do Faturamento: {dia_faturamento}
+
+        Por favor, certifique-se de que a verificação no Data Bit e o fechamento de leituras no PrintWayy sejam realizados sem atrasos para este contrato.
+
+        Bom trabalho,
+        Sistema de Alertas SystemFlow
+        """
         mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
 
         servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
@@ -141,16 +156,13 @@ def enviar_alerta(id):
         servidor.sendmail(MEU_EMAIL, email_notificacao, mensagem.as_string())
         servidor.quit()
 
-        return jsonify({'status': 'sucesso', 'mensagem': 'E-mail enviado!'})
+        return jsonify({'status': 'sucesso', 'mensagem': f'Lembrete real enviado com sucesso para o funcionário ({email_notificacao})!'})
 
     except Exception as erro:
-        # Vamos imprimir o erro completo com o traceback
-        import traceback
-        print("❌ ERRO DETALHADO:")
-        print(traceback.format_exc())
-        return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500
+        print(f"❌ Ocorreu um erro ao tentar enviar o e-mail: {erro}")
+        return jsonify({'status': 'erro', 'mensagem': 'Não foi possível enviar o e-mail real. Verifique as credenciais no terminal.'}), 500
 
-    
+
 if __name__ == '__main__':
     init_db()
     print("Banco de dados local contratos.db pronto!")

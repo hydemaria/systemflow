@@ -274,23 +274,14 @@
         });
 
         function dispararEmail(id) {
-    // Esse alerta vai aparecer na tela do navegador se o clique funcionar
-    alert("O botão funcionou! ID do contrato: " + id);
-    
-    fetch(`/api/contratos/${id}/enviar-alerta`, { method: 'POST' })
-    .then(res => res.json())
-    .then(dados => {
-        console.log("Resposta do servidor:", dados);
-        if (dados.status === 'sucesso') {
-            Swal.fire({ title: 'Sucesso!', text: dados.mensagem, icon: 'success' });
-        } else {
-            Swal.fire({ title: 'Erro', text: dados.mensagem, icon: 'error' });
+            fetch(`/api/contratos/${id}/enviar-alerta`, { method: 'POST' })
+            .then(res => res.json())
+            .then(dados => {
+                if (dados.status === 'sucesso') {
+                    Swal.fire({ title: 'E-mail Enviado!', text: dados.mensagem, icon: 'success' });
+                }
+            });
         }
-    })
-    .catch(err => {
-        console.error("Erro na conexão:", err);
-    });
-}
 
         function eliminarContrato(id) {
             Swal.fire({
