@@ -4,166 +4,64 @@ import smtplib
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask import Flask, render_template, request, jsonify
 
-# Definição dos caminhos para a pasta do projeto SystemFlow
-base_dir = "/home/maria/Projetos/systemflow"
+# 1. Caminho relativo (o mesmo do app.py)
+base_dir = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(base_dir, 'contratos.db')
 
-# Inicialização do Flask
-app = Flask(__name__,
-            template_folder=os.path.join(base_dir, 'templates'),
-            static_folder=os.path.join(base_dir, 'static'))
+# 2. Busca a senha das variáveis de ambiente
+MINHA_SENHA = os.environ.get('EMAIL_SENHA') 
 
-app.secret_key = "chave-secreta-para-sistema-financeiro-systemflow"
+def verificar_e_enviar_alertas():
+    if not MINHA_SENHA:
+        print("❌ Erro: Variável de ambiente EMAIL_SENHA não encontrada.")
+        return
 
-
-def init_db():
-    # Cria a tabela de contratos se ela não existir
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS contratos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            numero_contrato TEXT NOT NULL,
-            nome_cliente TEXT NOT NULL,
-            email_notificacao TEXT NOT NULL,
-            dia_faturamento INTEGER NOT NULL,
-            dia_alerta INTEGER NOT NULL,
-            possui_printwayy BOOLEAN NOT NULL,
-            data_inicio TEXT NOT NULL,
-            meses_duracao INTEGER NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-
-@app.route('/')
-def home():
-    # Carrega a página inicial do painel
-    return render_template('index.html')
-
-
-@app.route('/api/contratos', methods=['GET'])
-def listar_contratos():
-    # Busca os contratos armazenados no banco de dados
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM contratos')
-    linhas = cursor.fetchall()
-    conn.close()
-
-    contratos = []
-    for r in linhas:
-        contratos.append({
-            'id': r[0],
-            'numero_contrato': r[1],
-            'nome_cliente': r[2],
-            'email_notificacao': r[3],
-            'dia_faturamento': r[4],
-            'dia_alerta': r[5],
-            'possui_printwayy': bool(r[6]),
-            'data_inicio': r[7],
-            'meses_duracao': r[8]
-        })
-    return jsonify(contratos)
-
-
-@app.route('/api/contratos', methods=['POST'])
-def adicionar_contrato():
-    # Recebe os dados do formulário e salva no banco de dados
-    dados = request.json
-    hoje = datetime.now().strftime('%Y-%m-%d')
+    dia_atual = int(datetime.now().strftime('%d'))
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO contratos (numero_contrato, nome_cliente, email_notificacao, dia_faturamento, dia_alerta, possui_printwayy, data_inicio, meses_duracao)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        dados['numero_contrato'],
-        dados['nome_cliente'],
-        dados['email_notificacao'],
-        dados['dia_faturamento'],
-        dados['dia_alerta'],
-        dados['possui_printwayy'],
-        hoje,
-        dados['meses_duracao']
-    ))
-    conn.commit()
-    conn.close()
-    return jsonify({'status': 'sucesso'})
-
-
-@app.route('/api/contratos/<int:id>', methods=['DELETE'])
-def deletar_contrato(id):
-    # Remove um contrato específico do banco de dados
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM contratos WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'status': 'sucesso'})
-
-
-@app.route('/api/contratos/<int:id>/enviar-alerta', methods=['POST'])
-def enviar_alerta(id):
-    # Envia um e-mail de alerta manual usando o servidor SMTP
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('SELECT numero_contrato, nome_cliente, email_notificacao, dia_faturamento FROM contratos WHERE id = ?', (id,))
-    contrato = cursor.fetchone()
+    cursor.execute('SELECT numero_contrato, nome_cliente, email_notificacao, dia_faturamento FROM contratos WHERE dia_alerta = ?', (dia_atual,))
+    contratos_de_hoje = cursor.fetchall()
     conn.close()
 
-    if not contrato:
-        return jsonify({'status': 'erro', 'mensagem': 'Contrato não encontrado'}), 404
+    if not contratos_de_hoje:
+        print(f"[SystemFlow] Dia {dia_atual}: Nenhum lembrete para hoje.")
+        return
 
-    numero_contrato, nome_cliente, email_notificacao, dia_faturamento = contrato
-
-    # Configurações do servidor de e-mail (SMTP)
     MEU_EMAIL = "systemflow.automacao@gmail.com"
-    MINHA_SENHA = "ycjtvkacwexkzyrn"
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
     try:
-        mensagem = MIMEMultipart()
-        mensagem['From'] = MEU_EMAIL
-        mensagem['To'] = email_notificacao
-        mensagem['Subject'] = f"🚨 TAREFA: Faturamento Contrato Nº {numero_contrato} ({nome_cliente})"
-
-        corpo_email = f"""
-        🚨 LEMBRETE DE FATURAMENTO - SYSTEMFLOW
-
-        Atenção,
-
-        Este é um alerta automático para o setor de faturamento.
-        O contrato número {numero_contrato} (Cliente: {nome_cliente}) precisa ser faturado no dia correto.
-
-        🗓️ Dia do Faturamento: {dia_faturamento}
-
-        Por favor, certifique-se de que a verificação no Data Bit e o fechamento de leituras no PrintWayy sejam realizados sem atrasos para este contrato.
-
-        Bom trabalho,
-        Sistema de Alertas SystemFlow
-        """
-        mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
-
         servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
         servidor.starttls()
         servidor.login(MEU_EMAIL, MINHA_SENHA)
-        servidor.sendmail(MEU_EMAIL, email_notificacao, mensagem.as_string())
+
+        for contrato in contratos_de_hoje:
+            numero_contrato, nome_cliente, email_notificacao, dia_faturamento = contrato
+
+            mensagem = MIMEMultipart()
+            mensagem['From'] = f"SystemFlow <{MEU_EMAIL}>"
+            mensagem['To'] = email_notificacao
+            mensagem['Subject'] = f"🚨 TAREFA: Faturamento Contrato Nº {numero_contrato}"
+
+            corpo_email = f"""
+            🚨 LEMBRETE DE FATURAMENTO - SYSTEMFLOW
+            Atenção,
+            O contrato {numero_contrato} ({nome_cliente}) precisa ser faturado no dia {dia_faturamento}.
+            Bom trabalho,
+            Robô de Alertas SystemFlow
+            """
+            mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
+            
+            servidor.sendmail(MEU_EMAIL, [email_notificacao, MEU_EMAIL], mensagem.as_string())
+            print(f"[SystemFlow] E-mail enviado para {email_notificacao}")
+
         servidor.quit()
 
-        return jsonify({'status': 'sucesso', 'mensagem': f'Lembrete real enviado com sucesso para o funcionário ({email_notificacao})!'})
-
     except Exception as erro:
-        print(f"❌ Ocorreu um erro ao tentar enviar o e-mail: {erro}")
-        return jsonify({'status': 'erro', 'mensagem': 'Não foi possível enviar o e-mail real. Verifique as credenciais no terminal.'}), 500
-
+        print(f"❌ Erro na execução do robô: {erro}")
 
 if __name__ == '__main__':
-    init_db()
-    print("Banco de dados local contratos.db pronto!")
-    app.run(debug=True, port=5000)
+    verificar_e_enviar_alertas()
