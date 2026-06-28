@@ -11,7 +11,9 @@ DB_PATH = os.path.join(base_dir, 'contratos.db')
 
 def verificar_e_enviar_alertas():
     # Obtém o dia atual do mês
-    dia_atual = int(datetime.now().strftime('%d'))
+
+    #dia_atual = int(datetime.now().strftime('%d'))
+    dia_atual = 28
 
     # Conecta ao banco de dados e busca os contratos agendados para o dia de hoje
     conn = sqlite3.connect(DB_PATH)
