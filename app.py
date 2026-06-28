@@ -129,40 +129,19 @@ def enviar_alerta(id):
     SERVIDOR_SMTP = "smtp.gmail.com"
     PORTA_SMTP = 587
 
-    try:
-        mensagem = MIMEMultipart()
-        mensagem['From'] = MEU_EMAIL
-        mensagem['To'] = email_notificacao
-        mensagem['Subject'] = f"🚨 TAREFA: Faturamento Contrato Nº {numero_contrato} ({nome_cliente})"
-
-        corpo_email = f"""
-        🚨 LEMBRETE DE FATURAMENTO - SYSTEMFLOW
-
-        Atenção,
-
-        Este é um alerta automático para o setor de faturamento.
-        O contrato número {numero_contrato} (Cliente: {nome_cliente}) precisa ser faturado no dia correto.
-
-        🗓️ Dia do Faturamento: {dia_faturamento}
-
-        Por favor, certifique-se de que a verificação no Data Bit e o fechamento de leituras no PrintWayy sejam realizados sem atrasos para este contrato.
-
-        Bom trabalho,
-        Sistema de Alertas SystemFlow
-        """
-        mensagem.attach(MIMEText(corpo_email, 'plain', 'utf-8'))
-
+   try:
+        print("Tentando conectar ao servidor SMTP...")
         servidor = smtplib.SMTP(SERVIDOR_SMTP, PORTA_SMTP)
+        servidor.set_debuglevel(1)  # Isso vai imprimir MUITA informação nos logs
         servidor.starttls()
-        servidor.login(MEU_EMAIL, MINHA_SENHA)
-        servidor.sendmail(MEU_EMAIL, email_notificacao, mensagem.as_string())
+        print("Conexão e STARTTLS funcionaram!")
+        # Não vamos tentar o login ainda, só a conexão
         servidor.quit()
-
-        return jsonify({'status': 'sucesso', 'mensagem': f'Lembrete real enviado com sucesso para o funcionário ({email_notificacao})!'})
+        return jsonify({'status': 'sucesso', 'mensagem': 'Conexão com Gmail OK!'})
 
     except Exception as erro:
-        print(f"❌ Ocorreu um erro ao tentar enviar o e-mail: {erro}")
-        return jsonify({'status': 'erro', 'mensagem': 'Não foi possível enviar o e-mail real. Verifique as credenciais no terminal.'}), 500
+        print(f"❌ Erro na conexão: {erro}")
+        return jsonify({'status': 'erro', 'mensagem': str(erro)}), 500
 
 
 if __name__ == '__main__':
