@@ -48,7 +48,7 @@ def init_db():
 
 @app.route("/")
 def home():
-    return "OK FUNCIONANDO NO RENDER"
+    return str(os.listdir("templates"))
 
 
 @app.route('/api/contratos', methods=['GET'])
