@@ -29,6 +29,7 @@ O SystemFlow permite cadastrar contratos e enviar alertas automáticos por e-mai
 
 ## 📁 Estrutura do projeto
 
+```text
 systemflow/
 ├── app.py
 ├── requirements.txt
@@ -36,6 +37,7 @@ systemflow/
 ├── static/
 ├── .gitignore
 └── README.md
+```
 
 ---
 
