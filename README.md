@@ -1,135 +1,70 @@
-# 🚀 SystemFlow
+# SystemFlow
 
-Sistema web de automação de alertas de faturamento.
+Sistema de alertas de faturamento desenvolvido em Flask.
 
-O SystemFlow permite cadastrar contratos, monitorar datas de cobrança e enviar lembretes automáticos por e-mail, simulando um sistema interno usado em empresas.
-
-O projeto combina painel web + robô de automação em Python.
+O SystemFlow permite cadastrar contratos e enviar alertas automáticos por e-mail antes da data de faturamento, ajudando no controle operacional.
 
 ---
 
-## 💡 Funcionalidades
+## 🚀 Funcionalidades
 
 - Cadastro de contratos
-- Definição de datas de faturamento e alerta
-- Lista de contratos em painel web
-- Envio manual de e-mails de teste
+- Listagem de contratos
 - Remoção de contratos
-- Banco de dados local (SQLite)
-- Robô automático de envio de alertas por e-mail
+- Envio de alertas por e-mail
+- API em Flask
+- Banco de dados SQLite
 
 ---
 
-## ⚙️ Como funciona
+## 🧠 Tecnologias utilizadas
 
-### 🌐 Painel Web (Flask)
-
-- Interface para cadastrar e visualizar contratos
-- Permite envio manual de e-mails
-
-### 🤖 Robô de automação
-
-- Verifica diariamente o banco de dados
-- Envia e-mails quando o dia de alerta é atingido
-- Pode ser executado manualmente ou via cron no Linux
-
----
-
-## 🛠️ Tecnologias
-
-### Backend
-
-- Python  
-- Flask  
-- SQLite  
-- SMTP  
-
-### Frontend
-
-- HTML  
-- TailwindCSS  
-- JavaScript  
-- SweetAlert2  
+- Python
+- Flask
+- SQLite
+- HTML
+- SMTP
 
 ---
 
 ## 📁 Estrutura do projeto
 
 systemflow/
+├── app.py
+├── requirements.txt
+├── templates/
+├── static/
+├── .gitignore
+└── README.md
 
-├── app.py  
-├── bot_alertas.py  
-├── contratos.db  
-├── templates/  
-│   └── index.html  
-└── static/  
+---
+
+## 🔐 Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto:
+
+EMAIL_SENHA=sua_senha_de_app
+
+⚠️ Esse arquivo NÃO deve ser enviado ao GitHub.
 
 ---
 
 ## ⚙️ Como executar o projeto
 
-### 1. Clonar o repositório
+```bash
+git clone git@github.com:hydemaria/systemflow.git
+cd systemflow
 
-git clone https://github.com/hydemaria/systemflow.git  
+python -m venv venv
+source venv/bin/activate   # Linux / Mac
+venv\Scripts\activate      # Windows
 
-cd systemflow  
-
----
-
-### 2. Instalar dependências
-
-pip install flask  
-
----
-
-### 3. Rodar o sistema web
-
-python app.py  
+pip install -r requirements.txt
+python app.py
+```
 
 ---
 
-### 4. Acessar no navegador
+## 👩‍💻 Autora
 
-http://localhost:5000  
-
----
-
-## 🤖 Automação (robô de alertas)
-
-Executar manualmente:
-
-python bot_alertas.py  
-
----
-
-Agendar no Linux (cron):
-
-0 8 * * * python3 /home/maria/Projetos/systemflow/bot_alertas.py  
-
----
-
-## 🔐 Configuração de e-mail
-
-No arquivo bot_alertas.py:
-
-MEU_EMAIL = "seu_email@gmail.com"  
-MINHA_SENHA = "senha_de_app"  
-SERVIDOR_SMTP = "smtp.gmail.com"  
-PORTA_SMTP = 587  
-
----
-
-## 🎯 Objetivo do projeto
-
-- Backend com Flask  
-- Automação com Python  
-- Banco de dados SQLite  
-- Integração com e-mail  
-- Sistema web completo  
-
----
-
-## 👩‍💻 Desenvolvido por
-
-Maria Luiza  
-GitHub: https://github.com/hydemaria
+Maria Luiza (Hyde)
