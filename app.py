@@ -42,9 +42,13 @@ def init_db():
     conn.close()
 
 
-@app.route('/')
+#@app.route('/')
+#def home():
+    #return render_template('index.html')
+
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return "OK FUNCIONANDO NO RENDER"
 
 
 @app.route('/api/contratos', methods=['GET'])
